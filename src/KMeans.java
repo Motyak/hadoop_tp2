@@ -54,38 +54,54 @@ public class KMeans
             Writer.keyClass(IntWritable.class),
             Writer.valueClass(BaryWritable.class)
         );
+
+        for(BaryWritable b : barycenters)
+            writer.append(new IntWritable(b.getClusterId()), b);
     }
 
-    public static class KMeansMapper extends Mapper<LongWritable, Text, Text, IntWritable>
+    public static class KMeansMapper extends Mapper<LongWritable, Text, BaryWritable, PointWritable>
     {
-        @Override
-        public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
-        {
-            /* Je tokenise le texte en mots */
-            String[] tokens = value.toString().split("\\P{L}+");
+        private List<BaryWritable> barycenters = new ArrayList<>();
 
-            /* Je traite les tokens et écris les paires résultats */
-            for(String str : tokens)
-                if(!str.isBlank())
-                    context.write(
-                        new Text(str.toLowerCase()),
-                        new IntWritable(1)
-                    );
+        @Override
+        public void map(LongWritable key, Text value, Context context)
+        {   
+            // les values ici sont les lignes de fichiers csv
+            // Récupérer les barycentres et les ajouter à la liste en attribut du mapper
+
+            if(value.toString().charAt(0) == 'a')
+                return;
+
+            
+            
+
+            // /* Je tokenise le texte en mots */
+            // String[] tokens = value.toString().split("\\P{L}+");
+
+            // /* Je traite les tokens et écris les paires résultats */
+            // for(String str : tokens)
+            //     if(!str.isBlank())
+            //         context.write(
+            //             new Text(str.toLowerCase()),
+            //             new IntWritable(1)
+            //         );
         }
     }
 
     public static class KMeansReducer extends Reducer<Text, IntWritable, Text, IntWritable>
     {
         @Override
-        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException
+        public void reduce(Text key, Iterable<IntWritable> values, Context context)
         {
-            /* on calcule la somme des entiers */
-            int sum = 0;
-            for(IntWritable i : values)
-                sum += i.get();
+            
 
-            /* On écrit le résultat dans une paire */
-            context.write(key, new IntWritable(sum));
+            // /* on calcule la somme des entiers */
+            // int sum = 0;
+            // for(IntWritable i : values)
+            //     sum += i.get();
+
+            // /* On écrit le résultat dans une paire */
+            // context.write(key, new IntWritable(sum));
         }
     }
 
