@@ -26,9 +26,10 @@ public class BaryWritable extends PointWritable implements WritableComparable<Ba
 
     public void add(PointWritable point)
     {
+        double[] otherCoords = point.getCoordinates();
         // ajoute les coordonnées du point à celles de this
         for(int i = 0; i < this.coordinates.length; ++i)
-            this.coordinates[i] += point.getCoordinates()[i];
+            this.coordinates[i] += otherCoords[i];
     }
 
     public void divideBy(int size)

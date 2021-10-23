@@ -1,9 +1,17 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.SequenceFile.Reader;
+import org.apache.hadoop.io.SequenceFile.Writer;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
@@ -12,8 +20,41 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 public class KMeans
 {
-    final public static String PROP_BARY_PATH = "";
+    final public static String PROP_BARY_PATH = "bary";
     final public static int ITER_MAX = 1; //on commence avec 1 pour les tests
+
+    List<BaryWritable> readBarycenters(Configuration conf, String filename) throws IOException
+    {
+        Path path = new Path(conf.get(PROP_BARY_PATH) + "/" + filename);
+        Reader reader = new Reader(conf, Reader.file(path));
+
+        List<BaryWritable> res = new ArrayList<>();
+        Writable key = null;
+        BaryWritable val = null;
+
+        while(reader.next(key, val))
+            res.add((BaryWritable)val);
+        
+        reader.close();
+
+        return res;
+    }
+
+    void recordBarycenters(Configuration conf, String filename, List<BaryWritable> barycenters) throws IOException
+    {
+        Path path = new Path(conf.get(PROP_BARY_PATH) + "/" + filename);
+        FileSystem fs = FileSystem.get(conf);
+        
+        if(fs.exists(path))
+            fs.delete(path, true);
+
+        Writer writer = SequenceFile.createWriter(
+            conf,
+            Writer.file(path),
+            Writer.keyClass(IntWritable.class),
+            Writer.valueClass(BaryWritable.class)
+        );
+    }
 
     public static class KMeansMapper extends Mapper<LongWritable, Text, Text, IntWritable>
     {
