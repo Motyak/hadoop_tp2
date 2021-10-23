@@ -13,7 +13,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 public class KMeans
 {
     final public static String PROP_BARY_PATH = "";
-    final public static int ITER_MAX = 1;
+    final public static int ITER_MAX = 1; //on commence avec 1 pour les tests
 
     public static class KMeansMapper extends Mapper<LongWritable, Text, Text, IntWritable>
     {

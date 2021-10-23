@@ -6,8 +6,7 @@ import org.apache.hadoop.io.Writable;
 
 public class PointWritable implements Writable
 {
-
-    private double[] coordinates;
+    protected double[] coordinates;
 
     public PointWritable()
     {
@@ -43,17 +42,19 @@ public class PointWritable implements Writable
     }
 
     @Override
-    public void readFields(DataInput in) throws IOException
+    public void write(DataOutput out) throws IOException
     {
+        out.writeInt(this.coordinates.length);
         for(int i = 0; i < this.coordinates.length; ++i)
-            this.coordinates[i] = in.readDouble();
+            out.writeDouble(this.coordinates[i]);
     }
 
     @Override
-    public void write(DataOutput out) throws IOException
+    public void readFields(DataInput in) throws IOException
     {
-        for(int i = 0; i < this.coordinates.length; ++i)
-            out.writeDouble(this.coordinates[i]);
+        final int LENGTH = in.readInt();
+        for(int i = 0; i < LENGTH; ++i)
+            this.coordinates[i] = in.readDouble();
     }
 
     @Override
@@ -70,5 +71,4 @@ public class PointWritable implements Writable
 
         return str.toString();
     }
-
 }
