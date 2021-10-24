@@ -24,7 +24,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 public class KMeans
 {
     final public static String PROP_BARY_PATH = "bary";
-    final public static int ITER_MAX = 10; //on commence avec 1 pour les tests
+    final public static int ITER_MAX = 1; //on commence avec 1 pour les tests
 
     public static List<BaryWritable> readBarycenters(Configuration conf, String filename) throws IOException
     {
