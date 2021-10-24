@@ -24,7 +24,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 public class KMeans
 {
     final public static String PROP_BARY_PATH = "bary";
-    final public static int ITER_MAX = 1; //on commence avec 1 pour les tests
+    final public static int ITER_MAX = 10; //on commence avec 1 pour les tests
 
     public static List<BaryWritable> readBarycenters(Configuration conf, String filename) throws IOException
     {
@@ -36,8 +36,11 @@ public class KMeans
         BaryWritable val = new BaryWritable();
 
         while(reader.next(key, val))
+        {
             res.add(val);
-        
+            key = new IntWritable();
+        	val = new BaryWritable();
+        }
         reader.close();
 
         return res;
@@ -71,13 +74,15 @@ public class KMeans
     	BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(path)));
     	List<BaryWritable> barycenters = new ArrayList<>();
 
-        for(int i = 0; i < k; ++i)
+        int i = 0;
+        while(i < k)
         {
             String line = br.readLine();
     		if(line.charAt(0) == 'a')
     			continue;
     		PointWritable p = new PointWritable(line);
     		barycenters.add(new BaryWritable(i, p.getCoordinates()));
+            ++i;
         }
 
     	KMeans.recordBarycenters(config, "all", barycenters);
