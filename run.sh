@@ -2,6 +2,8 @@
 
 # Nom de la classe contenant la méthode main (sans .java)
 MAIN=$1
+NB_CLUSTERS=$2
+INPUT=$3
 SRC=src/*.java
 HADOOP_CLASSPATH="$(${HADOOP_HOME}/bin/hadoop classpath)"
 OUT_CLASS_DIR=bin
@@ -20,5 +22,5 @@ jar -cf $OUT_JAR_DIR/out.jar -C $OUT_CLASS_DIR . &&
 ${HADOOP_HOME}/bin/hdfs dfs -rm -r output
 
 # execution du jar en passant input et output en arguments
-${HADOOP_HOME}/bin/hadoop jar out.jar $MAIN input output
+${HADOOP_HOME}/bin/hadoop jar out.jar $MAIN $NB_CLUSTERS $INPUT output
 )

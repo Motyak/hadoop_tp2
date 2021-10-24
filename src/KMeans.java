@@ -15,7 +15,6 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.Reader;
 import org.apache.hadoop.io.SequenceFile.Writer;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
@@ -33,11 +32,11 @@ public class KMeans
         Reader reader = new Reader(conf, Reader.file(path));
 
         List<BaryWritable> res = new ArrayList<>();
-        Writable key = null;
-        BaryWritable val = null;
+        IntWritable key = new IntWritable();
+        BaryWritable val = new BaryWritable();
 
         while(reader.next(key, val))
-            res.add((BaryWritable)val);
+            res.add(val);
         
         reader.close();
 
@@ -61,6 +60,8 @@ public class KMeans
 
         for(BaryWritable b : barycenters)
             writer.append(new IntWritable(b.getClusterId()), b);
+
+        writer.close();
     }
 
     public static void initBarycenters(String fin, Configuration config, int k) throws IOException
@@ -117,9 +118,8 @@ public class KMeans
 		
 		Path outputFilePath = new Path(fout);
 		FileSystem fs = FileSystem.get(conf);
-		if(fs.exists(outputFilePath)) {
+		if(fs.exists(outputFilePath))
 			fs.delete(outputFilePath);
-		}
 		FileOutputFormat.setOutputPath(job, outputFilePath);
     	
     	return job;
@@ -204,10 +204,11 @@ public class KMeans
             // on initialise uniquement lors de la première itération
 			if(i == 0)
 				initBarycenters(input, job.getConfiguration(), K);
-			job.waitForCompletion(true);
+            if(!job.waitForCompletion(true))
+                System.exit(1);
 			updateBarycenters((job.getConfiguration()));
 		}
 
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        System.exit(0);
     }
 }

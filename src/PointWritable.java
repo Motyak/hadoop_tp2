@@ -22,7 +22,7 @@ public class PointWritable implements Writable
     {
         String[] coords = str.split(",");
         this.coordinates = new double[coords.length];
-        for(int i = 0; i <= coords.length; ++i)
+        for(int i = 0; i < coords.length; ++i)
             this.coordinates[i] = Double.parseDouble(coords[i]);
     }
 
@@ -35,7 +35,7 @@ public class PointWritable implements Writable
     {
         double[] otherCoords = point.getCoordinates();
         double sum = 0.0;
-        for(int i = 0; i <= otherCoords.length; ++i)
+        for(int i = 0; i < otherCoords.length; ++i)
             sum += Math.pow((this.coordinates[i] - otherCoords[i]), 2);
         
         return Math.sqrt(sum);
@@ -53,6 +53,7 @@ public class PointWritable implements Writable
     public void readFields(DataInput in) throws IOException
     {
         final int LENGTH = in.readInt();
+        this.coordinates = new double[LENGTH];
         for(int i = 0; i < LENGTH; ++i)
             this.coordinates[i] = in.readDouble();
     }
